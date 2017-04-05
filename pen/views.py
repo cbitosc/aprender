@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -28,3 +28,16 @@ def post_article(request):
         obj.author = request.user
         obj.save()
         return redirect('/')
+
+
+@login_required
+def post_edit(request, q_id):
+    q_obj = get_object_or_404(Article, pk=q_id)
+    form1 = ArticleForm(instance=q_obj)
+    if request.method == 'POST':
+        form1 = ArticleForm(request.POST, instance=q_obj)
+        obj = form1.save(commit=False)
+        obj.author = request.user
+        obj.save()
+        return redirect('article')
+    return render(request, 'post.html', {'form': form1})
